@@ -1,0 +1,145 @@
+var data = (function() {
+  function Tree(v) {
+    this.val = v || null;
+    this.left = null;
+    this.right = null;
+  };
+  Tree.prototype.add = function(v) {
+    if (!this.val) {
+      this.val = v;
+    } 
+    else if (this.val === v) {return}
+    else {
+      v < this.val
+        ? this.left ? this.left.add(v) : (this.left = new Tree(v))
+        : this.right ? this.right.add(v) : (this.right = new Tree(v));
+    }
+  };
+
+  var tree = new Tree();
+  var nums = [];
+  for (let i = 0; i < 127 ; i++) {
+    nums.push(i + 1);
+  }
+  while (nums.length) {
+    tree.add(nums.splice(Math.random() * nums.length, 1)[0]);
+  } 
+
+  function balance(a) {
+    var res = [];
+    ins(a);
+    return res.map(x => x[0]);
+    function ins(a) {
+      if (a.length < 2) {
+        return a;
+      }
+      res.push(a.slice(a.length / 2, a.length / 2 + 1));
+      res.push(ins(a.slice(0, a.length / 2)));
+      res.push(ins(a.slice(a.length / 2 + 1)));
+      res = res.filter(x => x.length);
+    }
+  }
+  // balance(nums).forEach(x=>tree.add(x))
+  
+  function addNode(v) {
+    tree.add(v)
+  }
+
+  return {
+    tree: tree,
+    addNode:addNode
+  };
+})();
+
+// function Node(props) {
+//   function branch(left,right) {
+//     if (props.n.left) {left = <div className='left'>/</div>}
+//     if (props.n.right) {right = <div className='right'>\</div>}
+//     // return <div>{left}{right}</div>
+//     // <div className='branch'>{branch()}</div>
+//   }
+//   function children(n,s) {
+//     // return !n ? <div className='null'></div> : s ? <Node n={props.n.left} /> : <Node n={props.n.right} />
+//     if (n) {return s ? <Node n={n} clickPass={props.clickPass} onClick={() => props.clickPass(props.n.left)} /> : <Node n={n} clickPass={props.clickPass} onClick={() => props.clickPass(props.n.right)} />}
+//   }
+//   return (
+//     <div className='node'>
+//       <div className='val' onClick={props.onClick}>{props.n.val}</div>
+//       <div className='child left'>{children(props.n.left,true)}</div><div className='child right'>{children(props.n.right)}</div>
+//     </div>
+//   )
+// }
+
+class Application extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      curr: data.tree,
+      history: [],
+      forward: [],
+      head: data.tree
+    };
+  }
+  renderTree(n) {
+    if (n) {
+      return (
+        <div className="node">
+          <div className="val" onClick={() => this.selectTree(n)}>
+            {n.val}
+          </div>
+          <div className="child left">{this.renderTree(n.left)}</div>
+          <div className="child right">{this.renderTree(n.right)}</div>
+        </div>
+      )
+    }
+  }
+  selectTree(n) {
+    var h = this.state.history.slice();
+    h.push(this.state.curr);
+    this.setState({ curr: n, history: h, forward: [] });
+  }
+  back() {
+    var h = this.state.history.slice();
+    if (h.length) {
+      var f = this.state.forward.slice();
+      var b = h.pop();
+      f.push(this.state.curr);
+      this.setState({ curr: b, history: h, forward: f });
+    }
+  }
+  forward() {
+    var f = this.state.forward.slice();
+    if (f.length) {
+      var h = this.state.history.slice();
+      h.push(this.state.curr);
+      var next = f.pop();
+      this.setState({ curr: next, history: h, forward: f });
+    }
+  }
+  head() {
+    if (this.state.curr !== data.tree) {
+      var h = this.state.history.slice();
+      h.push(this.state.curr);
+      this.setState({ curr: data.tree, history: h, forward: [] });
+    }
+  }
+  addNode() {
+    var v = Number(prompt('val?'))
+    data.addNode(v)
+    this.setState({})
+  }
+  // <Node n={this.state.curr} onClick={() => this.selectTree(this.state.curr)} clickPass={this.selectTree.bind(this)} />
+  render() {
+    return (
+      <div>
+        <button onClick={() => this.head()}>HEAD</button>
+        <button onClick={() => this.back()}>BACK</button>
+        <button onClick={() => this.forward()}>FORWARD</button>
+        <button onClick={() => this.addNode()}>ADD</button>
+        <div id='main'>{this.renderTree(this.state.curr)}</div>
+      </div>
+    )
+  }
+}
+
+ReactDOM.render(<Application />, document.getElementById("app"));
