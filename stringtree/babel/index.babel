@@ -1,0 +1,84 @@
+var data = (function() {
+  function Node(str) {
+    this.val = str
+    this.right = this.left = null
+  }
+  
+  Node.prototype.add = function(str) {
+    !this.val ? 
+      this.val = str :
+      str < this.val ?
+        this.left ?
+          this.left.add(str) :
+          this.left = new Node(str) :
+        this.right ?
+          this.right.add(str) :
+          this.right = new Node(str)
+  }
+  
+  var alpha = 'abcdefghijklmnopqrstuvwxyz'
+  var names = ['george','john','geoffrey','alan','alda','alfred','andrew','bill','barbara','caroline','christine','dave','jessica','']
+  var tree = new Node()
+  // for (var i = 0 ; i < 1000 ; i++) {
+    while (names.length) {tree.add(names.splice(Math.random()*names.length,1)[0])}
+  // }
+  
+  return {
+    tree: tree
+  };
+})();
+
+class Application extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      curr: data.tree
+    };
+  }
+  renderTree(n) {
+    if (n) {
+      return (
+        <div className="node">
+          <div className="val">
+            {n.val}
+          </div>
+          <div className="child left">{this.renderTree(n.left)}</div>
+          <div className="child right">{this.renderTree(n.right)}</div>
+        </div>
+      )
+    }
+  }
+  find(node) {
+    var search = prompt('enter letters')
+    var q = [node]
+    while (q.length) {
+      BFSrec.call(q.shift())
+    }
+    function inOrder() {
+      this.left && inOrder.call(this.left)
+      if (this.val.split('').slice(0,search.length).join('') === search) {console.log(this.val)}
+      this.right && inOrder.call(this.right)
+    }
+    function BFSrec() {
+      if (this.val.split('').slice(0,search.length).join('') === search) {
+        q = []
+        inOrder.call(this)
+      }
+      else {
+        this.left && q.push(this.left)
+        this.right && q.push(this.right)  
+      }
+    }
+  }
+
+  render() {
+    return (
+      <div>
+        <button onClick={()=>this.find(this.state.curr)}>FIND</button>
+        <div id='main'>{this.renderTree(this.state.curr)}</div>
+      </div>
+    )
+  }
+}
+
+ReactDOM.render(<Application />, document.getElementById("app"));
