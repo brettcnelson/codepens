@@ -1,0 +1,43 @@
+* {
+  box-sizing: border-box;
+}
+
+#table {
+  background-color: blue;
+}
+
+.floatcon {
+  background-color: black;
+  overflow: hidden;
+}
+
+.floats {
+/*   height: 500px; */
+  float:left;
+  background-color:yellow;
+  border: 10px solid;
+  padding: 6px;
+  margin: 1%;
+  width: 31.3%;
+}
+
+.right {
+  float:right;
+  text-align:right;
+}
+
+#under {
+  background-color: #f06d06;
+  border: 10px solid black;
+  padding: 20px;
+  margin:1% 0%;
+  text-align:center;
+  overflow:hidden;
+}
+
+.pics {
+  width: 23%;
+  padding: 1%;
+  margin:1%;
+  float:left;
+}
